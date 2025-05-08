@@ -1,0 +1,102 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 225 30% 12%;
+    --foreground: 210 40% 98%;
+
+    --card: 225 25% 16%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 225 25% 16%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 260 84% 60%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 215 25% 27%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 25% 27%;
+    --muted-foreground: 215 20% 70%;
+
+    --accent: 245 58% 50%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 210 40% 98%;
+
+    --border: 215 25% 27%;
+    --input: 215 25% 27%;
+    --ring: 260 84% 60%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 225 30% 12%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 260 84% 60%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 215 25% 27%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 25% 27%;
+    --sidebar-ring: 260 84% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.crypto-card {
+  @apply relative overflow-hidden p-6 rounded-xl transition-all duration-300 hover:shadow-lg;
+}
+
+.crypto-card::before {
+  content: '';
+  @apply absolute inset-0 opacity-10 bg-gradient-to-r;
+}
+
+.crypto-card.btc::before {
+  @apply from-crypto-btc to-crypto-btc/50;
+}
+
+.crypto-card.eth::before {
+  @apply from-crypto-eth to-crypto-eth/50;
+}
+
+.crypto-card.usdt::before {
+  @apply from-crypto-usdt to-crypto-usdt/50;
+}
+
+.glass-effect {
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500;
+}
+
+.gradient-bg {
+  @apply bg-gradient-to-br from-purple-500 to-blue-600;
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

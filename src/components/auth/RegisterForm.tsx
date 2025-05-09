@@ -17,7 +17,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const { register, isLoading } = useAuth();
+  const { isLoading } = useAuth();
+  const [isLogin, setIsLogin] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,9 +38,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
     try {
       const response = await SignUp(username, email, password);
       if (response.success === true) {
-        const userToken = response.user;
-        console.log(userToken);
-        await register(userToken);
+        setTimeout(() => {
+          onToggleForm();
+        }, 2000);
       }
     } catch (error) {
       // Error is handled by the AuthProvider

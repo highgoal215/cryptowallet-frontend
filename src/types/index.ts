@@ -8,7 +8,7 @@ export interface User {
 
 export interface Wallet {
   id: string;
-  type: 'BTC' | 'ETH' | 'USDT';
+  type: 'BTC' | 'ETH' | 'TRX';
   name?: string;
   address: string;
   balance: number;

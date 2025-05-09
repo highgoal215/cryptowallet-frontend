@@ -7,7 +7,6 @@ import TransactionsTable from '@/components/dashboard/TransactionsTable';
 import DepositDialog from '@/components/dashboard/DepositDialog';
 import WithdrawDialog from '@/components/dashboard/WithdrawDialog';
 import { useWallet } from '@/context/WalletContext';
-import AnimatedContent from '@/animation/AnimatedContent/AnimatedContent';
 
 const Dashboard: React.FC = () => {
   const { bankDetails, transactions } = useWallet();

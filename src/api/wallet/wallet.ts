@@ -4,7 +4,6 @@ const Backend_Url = 'http://localhost:5000/api';
 
 export const CreateNewWallet = async (addressType: string, accountName: string) => {
     try {
-        console.log(`Creating wallet with type: ${addressType}, account name: ${accountName}`);
 
         const response = await axios.post(`${Backend_Url}/walletcreate`, {
             addressType,
@@ -50,9 +49,9 @@ export const ImportWallet = async (privateKey: string, accountName: string, addr
     }
 }
 
-export const Transfer = async (fromAddress: string, toAddress: string, amount: string) => {
+export const Transfer = async (fromAddress: string, toAddress: string, amount: string, walletType : string) => {
     try {
-        const response = await axios.post(`${Backend_Url}/transfer/eth`, { fromAddress, toAddress, amount }, {
+        const response = await axios.post(`${Backend_Url}/transfer/${walletType}`, { fromAddress, toAddress, amount }, {
             withCredentials: true
         });
 
@@ -66,3 +65,20 @@ export const Transfer = async (fromAddress: string, toAddress: string, amount: s
         } else console.error("Unexpected error: ", error);
     }
 }
+
+export const GetAllWallets = async () => {
+    try {
+        const response = await axios.get(`${Backend_Url}/wallets`, {
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error: any) {
+        console.error("Get All Wallet Error:", {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status,
+            url: `${Backend_Url}/wallets`,
+        });
+        throw new Error("Failed to fetch wallets");
+    }
+};

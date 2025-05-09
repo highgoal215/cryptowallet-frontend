@@ -1,11 +1,10 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BankDetails } from "@/types";
 import { Button } from "@/components/ui/button";
-import { AlignRight, Copy } from "lucide-react";
+import {  Copy } from "lucide-react";
 import { useToast } from '@/components/ui/use-toast';
-import AnimatedContent from '@/animation/AnimatedContent/AnimatedContent';
 
 interface BankDetailsCardProps {
   bankDetails: BankDetails;

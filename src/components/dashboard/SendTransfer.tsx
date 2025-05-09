@@ -12,14 +12,19 @@ interface TransferDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     currentWalletAddress?: string;
+    type ?: string;
 }
 
-const TransferDialog: React.FC<TransferDialogProps> = ({ open, onOpenChange, currentWalletAddress }) => {
+const TransferDialog: React.FC<TransferDialogProps> = ({ open, onOpenChange, currentWalletAddress, type }) => {
     const [amount, setAmount] = useState<string>('100');
     const { isLoading, updateTwoWallets } = useWallet();
     const [isReceiveAddress, setIsReceiveAddress] = useState<string>("");
 
     const handleTransfer = async () => {
+        let walletType = "";
+        if (type === "BTC") walletType = "btc";
+        else if (type === "ETH") walletType = "eth";
+        else walletType = "tron";
         if (isReceiveAddress === "") {
             toast.error("Error! Please input receive address");
             return;
@@ -27,7 +32,7 @@ const TransferDialog: React.FC<TransferDialogProps> = ({ open, onOpenChange, cur
             toast.error("Error! Please input amount");
         } else {
             try {
-                const response = await Transfer(currentWalletAddress, isReceiveAddress, amount);
+                const response = await Transfer(currentWalletAddress, isReceiveAddress, amount, walletType);
                 console.log(response);
                 if (response.success === true) {
                     updateTwoWallets(currentWalletAddress, isReceiveAddress, Number(amount));

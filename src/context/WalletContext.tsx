@@ -13,8 +13,9 @@ interface WalletContextType {
   initiateDeposit: (amount: number) => Promise<void>;
   initiateWithdrawal: (walletType: string, amount: number, address: string) => Promise<void>;
   refreshWallets: () => Promise<void>;
-  createWallet: (type: 'BTC' | 'ETH' | 'USDT', name?: string, address?: string, balance?: string) => Promise<void>;
+  createWallet: (type: 'BTC' | 'ETH' | 'TRX', name?: string, address?: string, balance?: string) => Promise<void>;
   importWallet: (address: string, accountName: string, accountType: string, balance: string) => Promise<void>;
+  getAllWallets: (address: string, accountName: string, accountType: string, balance: string) => Promise<void>;
   updateTwoWallets: (sendAddress: string, receiveAddress: string, amount: number) => Promise<void>;
   initiateSwap: (fromWalletType: string, toWalletType: string, amount: number) => Promise<void>;
   buyToken: (walletType: string, amount: number) => Promise<void>;
@@ -22,10 +23,10 @@ interface WalletContextType {
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
-function generateRandomAddress(type: 'BTC' | 'ETH' | 'USDT'): string {
+function generateRandomAddress(type: 'BTC' | 'ETH' | 'TRX'): string {
   if (type === 'BTC') {
     return `bc1${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
-  } else if (type === 'ETH' || type === 'USDT') {
+  } else if (type === 'ETH' || type === 'TRX') {
     return `0x${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
   }
   return '';
@@ -47,7 +48,7 @@ function generateMockTransactions(userId: string): Transaction[] {
     return date;
   });
 
-  const cryptoTypes = ["BTC", "ETH", "USDT"];
+  const cryptoTypes = ["BTC", "ETH", "TRX"];
   const transactionTypes: ('deposit' | 'withdrawal' | 'swap')[] = ["deposit", "withdrawal", "swap"];
   const statuses: ('pending' | 'completed' | 'failed')[] = ["completed", "completed", "completed", "pending"];
 
@@ -120,7 +121,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const prices = {
         BTC: 55000 + Math.random() * 1000,
         ETH: 3000 + Math.random() * 200,
-        USDT: 1.0
+        TRX: 1.0
       };
 
       setWallets(current =>
@@ -129,11 +130,6 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           usdValue: wallet.balance * prices[wallet.type]
         }))
       );
-
-      toast({
-        title: "Wallet Refreshed",
-        description: "Latest balances and prices loaded",
-      });
     } catch (error) {
       toast({
         variant: "destructive",
@@ -246,7 +242,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const createWallet = async (type: 'BTC' | 'ETH' | 'USDT', name?: string, address?: string, balance?: string) => {
+  const createWallet = async (type: 'BTC' | 'ETH' | 'TRX', name?: string, address?: string, balance?: string) => {
     setIsLoading(true);
 
     try {
@@ -286,7 +282,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const importWallet = async (address: string, accountName: string, addressType: 'BTC' | 'ETH' | 'USDT', balance: string) => {
+  const importWallet = async (address: string, accountName: string, addressType: 'BTC' | 'ETH' | 'TRX', balance: string) => {
     setIsLoading(true);
 
     try {
@@ -308,10 +304,39 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       localStorage.removeItem("importwallet");
       localStorage.setItem("importwallet", JSON.stringify(importedWallet));
 
+      refreshWallets();
+    } catch (error) {
       toast({
-        title: "Wallet Imported",
-        description: `Your new ${addressType} wallet "${accountName}" has been imported successfully.`,
+        variant: "destructive",
+        title: "Wallet Import Failed",
+        description: error instanceof Error ? error.message : "An unkown error occurred",
       });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const getAllWallets = async (address: string, accountName: string, addressType: 'BTC' | 'ETH' | 'TRX', balance: string) => {
+    setIsLoading(true);
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      if (!user) throw new Error("User must be logged in to import a wallet");
+
+      const getWallets: Wallet = {
+        id: `${addressType.toLowerCase()}-${Date.now()}`,
+        type: addressType,
+        name: accountName,
+        address: address,
+        balance: Number(balance),
+        usdValue: 0
+      }
+
+      setWallets(prev => [...prev, getWallets]);
+      localStorage.removeItem("importwallet");
+      localStorage.setItem("importwallet", JSON.stringify(getWallets));
 
       refreshWallets();
     } catch (error) {
@@ -332,7 +357,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       await new Promise(resolve => setTimeout(resolve, 500));
 
       // Update state
-      setImportedWallet(prev => {
+      setWallets(prev => {
         return prev.map(wallet => {
           if (wallet.address === sendAddress) {
             return { ...wallet, balance: wallet.balance - amount };
@@ -346,6 +371,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       // Update localStorage if applicable
       const stored = localStorage.getItem("importwallet");
+      console.log(stored);
       if (stored) {
         const parsedWallet: Wallet = JSON.parse(stored);
         if (parsedWallet.address === sendAddress) {
@@ -370,7 +396,6 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsLoading(false);
     }
   };
-
 
   const initiateSwap = async (fromWalletType: string, toWalletType: string, amount: number) => {
     setIsLoading(true);
@@ -398,7 +423,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const rates = {
         BTC: 55000,
         ETH: 3000,
-        USDT: 1.0
+        TRX: 1.0
       };
 
       const fromValueUSD = amount * rates[fromWalletType as keyof typeof rates];
@@ -516,6 +541,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         refreshWallets,
         createWallet,
         importWallet,
+        getAllWallets,
         updateTwoWallets,
         initiateSwap,
         buyToken

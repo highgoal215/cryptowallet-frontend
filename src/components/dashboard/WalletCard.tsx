@@ -17,7 +17,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet, onDepositClick, onWithd
   const [isOpenTransferDialog, setIsOpenTransferDialog] = useState<boolean>(false);
 
   const formattedBalance = balance.toLocaleString(undefined, {
-    maximumFractionDigits: type === 'USDT' ? 2 : 8
+    maximumFractionDigits: type === 'TRX' ? 2 : 8
   });
 
   const formattedUsdValue = new Intl.NumberFormat('en-US', {
@@ -31,7 +31,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet, onDepositClick, onWithd
         return <Bitcoin className="h-5 w-5 text-crypto-btc" />;
       case 'ETH':
         return <Wallet className="h-5 w-5 text-crypto-eth" />;
-      case 'USDT':
+      case 'TRX':
         return <DollarSign className="h-5 w-5 text-crypto-usdt" />;
       default:
         return <Wallet className="h-5 w-5" />;
@@ -117,7 +117,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet, onDepositClick, onWithd
           </div>
         </div>
       </CardContent>
-      <TransferDialog open={isOpenTransferDialog} onOpenChange={setIsOpenTransferDialog} currentWalletAddress={address} />
+      <TransferDialog open={isOpenTransferDialog} onOpenChange={setIsOpenTransferDialog} currentWalletAddress={address} type={type} />
     </Card>
   );
 };

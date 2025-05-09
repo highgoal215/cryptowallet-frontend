@@ -26,10 +26,10 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from 'sonner';
-import { CreateNewWallet, ImportWallet } from '@/api/wallet/wallet';
+import { CreateNewWallet, GetAllWallets, ImportWallet } from '@/api/wallet/wallet';
 
 const Wallets: React.FC = () => {
-  const { wallets, importedWallets, createWallet, initiateSwap, importWallet } = useWallet();
+  const { wallets, importedWallets, createWallet, initiateSwap, importWallet, getAllWallets } = useWallet();
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [selectedWalletType, setSelectedWalletType] = useState<string>('BTC');
@@ -78,7 +78,7 @@ const Wallets: React.FC = () => {
       else newWallet = 'tron';
       const response = await CreateNewWallet(newWallet, newWalletName);
       if (response) {
-        await createWallet(newWalletType as 'BTC' | 'ETH' | 'USDT', newWalletName, response.address, response.balance);
+        await createWallet(newWalletType as 'BTC' | 'ETH' | 'TRX', newWalletName, response.address, response.balance);
         setIsCreateOpen(false);
         setNewWalletName("");
         setIsCheck(false);
@@ -118,13 +118,13 @@ const Wallets: React.FC = () => {
 
       if (iswalletType === "BTC") addressType = "bitcoin";
       else if (iswalletType === "ETH") addressType = "ethereum";
-      else if (iswalletType === "USDT") addressType = "tron"
+      else if (iswalletType === "TRX") addressType = "tron"
 
       try {
         const response = await ImportWallet(isWalletPrivateKey, isWalletName, addressType);
         if (response.message === "Wallet imported successfully") {
           localStorage.setItem("importwallet", JSON.stringify(response.wallet));
-          await importWallet(response.wallet.address, isWalletName, iswalletType as 'BTC' | 'ETH' | 'USDT', response.wallet.balance);
+          await importWallet(response.wallet.address, isWalletName, iswalletType as 'BTC' | 'ETH' | 'TRX', response.wallet.balance);
           setIsImportWalletOpen(false);
           setIsCheck(true);
         }
@@ -133,6 +133,28 @@ const Wallets: React.FC = () => {
       }
     }
   }
+
+  useEffect(() => {
+    const getFetchAllWallets = async () => {
+      const response = await GetAllWallets();
+
+      if (response.success === true) {
+        localStorage.removeItem("wallet");
+        localStorage.setItem("wallet", JSON.stringify(response));
+        console.log(response.wallets)
+
+        for (let i = 0; i < response.wallets.length; i++) {
+          let iswalletType = "";
+
+          if (response.wallets[i].addressType === "bitcoin") iswalletType = "BTC";
+          else if (response.wallets[i].addressType === "etherium") iswalletType = "ETH";
+          else iswalletType = "TRX";
+          await getAllWallets(response.wallets[i].address, response.wallets[i].accountName, iswalletType as 'BTC' | 'ETH' | 'TRX', response.wallets[i].balance);
+        }
+      }
+    }
+    getFetchAllWallets();
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary">
@@ -162,7 +184,7 @@ const Wallets: React.FC = () => {
                       <SelectContent>
                         <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
                         <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
-                        <SelectItem value="USDT">Tether (USDT)</SelectItem>
+                        <SelectItem value="TRX">Tron (TRX)</SelectItem>
                       </SelectContent>
                     </Select>
                     <div className="space-y-2">
@@ -287,7 +309,7 @@ const Wallets: React.FC = () => {
                         <SelectContent>
                           <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
                           <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
-                          <SelectItem value="USDT">Tether (USDT)</SelectItem>
+                          <SelectItem value="Tron">Tron (TRX)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

@@ -13,24 +13,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock user data for demo purposes
-const MOCK_USERS = [
-  {
-    id: "user-id",
-    email: "user@email.com",
-    username: "user",
-    password: "user123",
-    isAdmin: false
-  },
-  {
-    id: "test-user-id",
-    email: "test@example.com",
-    username: "test",
-    password: "test1234",
-    isAdmin: true // Setting test user as admin
-  }
-];
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
